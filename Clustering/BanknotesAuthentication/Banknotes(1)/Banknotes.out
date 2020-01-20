@@ -1,0 +1,6 @@
+\BOOKMARK [2][-]{subsection.0.1}{Exploratory analysis of the data}{}% 1
+\BOOKMARK [2][-]{subsection.0.2}{Step 1: run K-means on the given dataset}{}% 2
+\BOOKMARK [2][-]{subsection.0.3}{Step 2: visualise the results.}{}% 3
+\BOOKMARK [2][-]{subsection.0.4}{Step 3: re-run K-means several times and visualise the results.}{}% 4
+\BOOKMARK [2][-]{subsection.0.5}{Step 4: compare the results: is the K-means algorithm stable?}{}% 5
+\BOOKMARK [2][-]{subsection.0.6}{Step 5: describe your results.}{}% 6
