@@ -10,6 +10,7 @@ Projects included:
 
 2. Clustering      
   a. Banknotes Authentication    
+  b. E-Commerce Customer Segmentation
   
 3. Deep Learning and Neural Networks     
   a. Stock Price Timeseries Predictions with RNN and LSTM    
