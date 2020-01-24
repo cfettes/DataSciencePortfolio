@@ -2,11 +2,11 @@
 
 This repository contains a number of data science projects that I have completed on my quest to learn more about data science and machine learning
 
-Projects included:
-1. Classification
-  a. Bank Marketing Analysis 
-  b. MNIST Classification
-  c. Gaussian Generative Wine Classification
+Projects included:   
+1. Classification   
+  a. Bank Marketing Analysis      
+  b. MNIST Classification     
+  c. Gaussian Generative Wine Classification     
 
 2. Clustering
   a. Banknotes Authentication
