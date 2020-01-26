@@ -23,7 +23,8 @@ Projects included:
   b. Fake News Detection    
   c. Sentiment Analysis with Linear Classifiers    
   d. Multilabel Classification - Predicting StackOverflow Tags    
-  e. Named Entity Recognition    
+  e. Named Entity Recognition   
+  f. Topic Modelling Amazon Reviews
   
 6. Recommenders    
   a. Collaborative Filtering Movie Recommendations    
