@@ -5,7 +5,7 @@ This repository contains a number of data science projects that I have completed
 Projects included:   
 1. Classification   
   a. Bank Marketing Analysis      
-  b. Breast Cancer Diagnosis Prediction
+  b. Breast Cancer Diagnosis Prediction       
   c. MNIST Classification     
   d. Gaussian Generative Wine Classification     
 
@@ -15,7 +15,7 @@ Projects included:
   
 3. Deep Learning and Neural Networks  
   a. Automatic Image Caption Generation with VGG16   
-  b. Sentiment Analysis using Deep Learning
+  b. Sentiment Analysis using Deep Learning       
   c. Stock Price Timeseries Predictions with RNN and LSTM    
   
 4. Ensemble    
