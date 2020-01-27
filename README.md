@@ -12,8 +12,9 @@ Projects included:
   a. Banknotes Authentication    
   b. E-Commerce Customer Segmentation
   
-3. Deep Learning and Neural Networks     
-  a. Stock Price Timeseries Predictions with RNN and LSTM    
+3. Deep Learning and Neural Networks  
+  a. Automatic Image Caption Generation with VGG16
+  b. Stock Price Timeseries Predictions with RNN and LSTM    
   
 4. Ensemble    
   a. Predicting Future Sales     
