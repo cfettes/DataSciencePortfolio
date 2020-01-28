@@ -13,13 +13,15 @@ Projects included:
   a. Banknotes Authentication    
   b. E-Commerce Customer Segmentation
   
-3. Deep Learning and Neural Networks  
-  a. Automatic Image Caption Generation with VGG16   
-  b. Sentiment Analysis using Deep Learning       
-  c. Stock Price Timeseries Predictions with RNN and LSTM    
+3. Regression   
+  a. Linear Regression from Scratch to Predict Walmart Sales    
+  b. Predicting Future Sales       
   
-4. Ensemble    
-  a. Predicting Future Sales     
+4. Deep Learning and Neural Networks  
+  a. Automatic Image Caption Generation with VGG16   
+  b. Review Summarisation       
+  c. Sentiment Analysis using Deep Learning       
+  d. Stock Price Timeseries Predictions with RNN and LSTM      
   
 5. NLP   
   a. Embeddings To Find Duplicate Questions   
@@ -30,10 +32,7 @@ Projects included:
   f. Topic Modelling Amazon Reviews
   
 6. Recommenders    
-  a. Collaborative Filtering Movie Recommendations    
+  a. Collaborative Filtering Movie Recommendations     
   
-7. Regression   
-  a. Linear Regression from Scratch to Predict Walmart Sales    
-  
-8. Statistical Analysis    
+7. Statistical Analysis    
   a. NHANES - Analysis of BP    
