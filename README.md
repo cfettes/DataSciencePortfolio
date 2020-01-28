@@ -37,5 +37,6 @@ Projects included:
 7. Statistical Analysis    
   a. NHANES - Analysis of BP    
   
-8.Other    
-  a. Association Rule Learning - Basket Analysis with Apriori
+8. Other    
+  a. Association Rule Learning - Basket Analysis with Apriori     
+  
