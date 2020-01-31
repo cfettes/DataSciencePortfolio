@@ -20,9 +20,10 @@ Projects included:
   
 4. Deep Learning and Neural Networks  
   a. Automatic Image Caption Generation with VGG16   
-  b. Review Summarisation       
-  c. Sentiment Analysis using Deep Learning       
-  d. Stock Price Timeseries Predictions with RNN and LSTM      
+  b. Review Summarisation   
+  c. Building RNN from scratch to generate names of dinosaurs, people and Pokemon      
+  d. Sentiment Analysis using Deep Learning       
+  e. Stock Price Timeseries Predictions with RNN and LSTM      
   
 5. NLP   
   a. Embeddings To Find Duplicate Questions   
