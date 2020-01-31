@@ -7,7 +7,8 @@ Projects included:
   a. Bank Marketing Analysis      
   b. Breast Cancer Diagnosis Prediction       
   c. MNIST Classification     
-  d. Gaussian Generative Wine Classification     
+  d. Gaussian Generative Wine Classification  
+  e. Logistic Regression from Scratch to Predict Cervical Cancer    
 
 2. Clustering      
   a. Banknotes Authentication    
