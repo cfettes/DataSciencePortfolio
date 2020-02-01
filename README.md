@@ -27,8 +27,8 @@ Projects included:
   
 5. NLP   
   a. Chatbots       
-    i. Seq2Seq_Chatbot_and_Transformer_Chatbot        
-    ii. Simple_Seq2Seq_Chatbot         
+      i. Seq2Seq_Chatbot_and_Transformer_Chatbot        
+      ii. Simple_Seq2Seq_Chatbot         
   b. Embeddings To Find Duplicate Questions   
   c. Fake News Detection    
   d. Sentiment Analysis with Linear Classifiers    
