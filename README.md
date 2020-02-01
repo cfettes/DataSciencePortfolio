@@ -40,5 +40,6 @@ Projects included:
   a. NHANES - Analysis of BP    
   
 8. Other    
-  a. Association Rule Learning - Basket Analysis with Apriori     
+  a. Association Rule Learning - Basket Analysis with Apriori  
+  b. Experiments with PCA on different datasets    
   
