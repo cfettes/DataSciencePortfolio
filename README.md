@@ -26,7 +26,7 @@ Projects included:
   e. Stock Price Timeseries Predictions with RNN and LSTM      
   
 5. NLP   
-  a. Chatbots: (i) Seq2Seq_Chatbot_and_Transformer_Chatbot; (ii) Simple_Seq2Seq_Chatbot            
+  a. Chatbots: (i) Rule-Based Chatbot using information scraped from Wikipedia; (ii) Seq2Seq_Chatbot_and_Transformer_Chatbot; (iii) Simple_Seq2Seq_Chatbot            
   b. Embeddings To Find Duplicate Questions   
   c. Fake News Detection    
   d. Sentiment Analysis with Linear Classifiers    
