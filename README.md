@@ -26,12 +26,15 @@ Projects included:
   e. Stock Price Timeseries Predictions with RNN and LSTM      
   
 5. NLP   
-  a. Embeddings To Find Duplicate Questions   
-  b. Fake News Detection    
-  c. Sentiment Analysis with Linear Classifiers    
-  d. Multilabel Classification - Predicting StackOverflow Tags    
-  e. Named Entity Recognition   
-  f. Topic Modelling Amazon Reviews
+  a. Chatbots       
+    i. Seq2Seq_Chatbot_and_Transformer_Chatbot        
+    ii. Simple_Seq2Seq_Chatbot         
+  b. Embeddings To Find Duplicate Questions   
+  c. Fake News Detection    
+  d. Sentiment Analysis with Linear Classifiers    
+  e. Multilabel Classification - Predicting StackOverflow Tags    
+  f. Named Entity Recognition   
+  g. Topic Modelling Amazon Reviews
   
 6. Recommenders    
   a. Collaborative Filtering Movie Recommendations     
