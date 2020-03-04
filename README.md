@@ -3,23 +3,23 @@
 This repository contains a number of data science projects that I have completed on my quest to learn more about data science and machine learning
 
 Projects included:   
-A. Classification   
+**A. Classification**
   a. Bank Marketing Analysis      
   b. Breast Cancer Diagnosis Prediction       
   c. MNIST Classification     
   d. Gaussian Generative Wine Classification  
   e. Logistic Regression from Scratch to Predict Cervical Cancer    
 
-B. Clustering      
+**B. Clustering**      
   a. Banknotes Authentication    
   b. E-Commerce Customer Segmentation     
   
-C. Regression   
+**C. Regression**   
   a. Linear Regression from Scratch to Predict Walmart Sales    
   b. Predicting Future Sales       
   c. Predicting PM2.5 Concentration in China    
   
-D. Deep Learning and Neural Networks  
+**D. Deep Learning and Neural Networks**  
   a. Autoencoders     
   b. CNN for Predicting Picture Labels    
   c. Image Caption Generator    
@@ -28,7 +28,7 @@ D. Deep Learning and Neural Networks
   f. Sentiment Analysis using Deep Learning       
   g. Stock Price Timeseries Predictions with RNN and LSTM      
   
-E. NLP   
+**E. NLP**   
   a. Chatbots:         
           (i) Retrieval Chatbot with PyTorch;       
           (ii) Rule-Based Chatbot using information scraped from Wikipedia;      
@@ -41,18 +41,18 @@ E. NLP
   f. Named Entity Recognition    
   g. Topic Modelling Amazon Reviews    
   
-F. Recommenders    
+**F. Recommenders**    
   a. Collaborative Filtering Movie Recommendations     
   
-G. Statistical Analysis    
+**G. Statistical Analysis**    
   a. NHANES - Analysis of BP    
   
-H. Other    
+**H. Other**    
   a. Association Rule Learning - Basket Analysis with Apriori  
   b. CLV and Churn with Lifetimes     
   c. Experiments with PCA on different datasets    
   
-I. Bayesian     
+**I. Bayesian**     
   a. Bayesian Linear Regression for House Sale Price Prediction    
   b. Bayesian Optimisation    
   c. Deep Generative Models on CelebA dataset - includes VAE, GAN and VAEGAN      
@@ -60,5 +60,5 @@ I. Bayesian
   e. Logistic Regression with PyMC3    
   f. VAE on MNIST and CIFAR   
   
-J. SQL
+**J. SQL**   
   
