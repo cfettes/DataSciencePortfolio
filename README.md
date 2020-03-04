@@ -17,14 +17,16 @@ Projects included:
 3. Regression   
   a. Linear Regression from Scratch to Predict Walmart Sales    
   b. Predicting Future Sales       
+  c. Predicting PM2.5 Concentration in China    
   
 4. Deep Learning and Neural Networks  
   a. Autoencoders     
-  b. CNN for Predicting Picture Labels     
-  c. Building RNN from scratch to generate names of dinosaurs, people and Pokemon      
-  d. Review Summarisation   
-  e. Sentiment Analysis using Deep Learning       
-  f. Stock Price Timeseries Predictions with RNN and LSTM      
+  b. CNN for Predicting Picture Labels    
+  c. Image Caption Generator    
+  d. Building RNN from scratch to generate names of dinosaurs, people and Pokemon      
+  e. Review Summarisation   
+  f. Sentiment Analysis using Deep Learning       
+  g. Stock Price Timeseries Predictions with RNN and LSTM      
   
 5. NLP   
   a. Chatbots:         
@@ -51,5 +53,10 @@ Projects included:
   c. Experiments with PCA on different datasets    
   
 9. Bayesian     
-  a. Bayesian Linear Regression for House Sale Price Prediction     
+  a. Bayesian Linear Regression for House Sale Price Prediction    
+  b. Bayesian Optimisation    
+  c. Deep Generative Models on CelebA dataset - includes VAE, GAN and VAEGAN      
+  d. Expectation Maximisation    
+  e. Logistic Regression with PyMC3    
+  f. VAE on MNIST and CIFAR     
   
