@@ -1,0 +1,444 @@
+/*AB TESTING
+Tasks here are: 
+(1) Analyse current tests running and test assignments of users
+(2) Create a new test metric
+(3) Analyse results
+*/
+
+/*SQL queries completed as part of Learn SQL Basics for Data Science Specialisation on Coursera; Module 2: Data Wrangling, Analysis and AB Testing with SQL
+These queries use a synthetic e-commerce dataset, which can be accessed by signing up to Mode analytics through https://mode.com/, then following the link 
+https://modeanalytics.com/dsv1069/reports/0401f3197d05, and then clicking the 'clone' button to make a copy of the report. Once these steps have been completed, 
+queries can be made on the dataset*/
+
+/*(1) Analyse current tests running and test assignments of users*/
+--how many tests are running
+SELECT 
+  COUNT(DISTINCT parameter_value) AS tests
+FROM 
+  dsv1069.events
+WHERE 
+  event_name = 'test_assignment'
+AND 
+  parameter_name = 'test_id';
+--4 tests running
+
+--check for potential problems with test assignments; make sure no data obviously missing
+SELECT 
+  parameter_value AS test_id,
+  DATE(event_time) as day,
+  COUNT(*) AS event_rows
+FROM 
+  dsv1069.events
+WHERE 
+  event_name = 'test_assignment'
+AND
+  parameter_name = 'test_id'
+GROUP BY 
+  parameter_value,
+  DATE(event_time);
+--gives count of events each day per test; can visualise in chart to see if any missing days of data
+
+--make sure users assigned only one treatment group awithin each test
+SELECT
+  test_id,
+  user_id,
+  COUNT(DISTINCT test_assignment) AS assignments
+FROM
+(SELECT
+  event_id,
+  event_time,
+  user_id,
+  platform,
+  MAX(CASE WHEN parameter_name = 'test_id'
+    THEN CAST(parameter_value AS INT)
+    ELSE NULL
+  END) AS test_id,
+  MAX(CASE WHEN parameter_name = 'test_assignment'
+    THEN parameter_value
+    ELSE NULL
+  END) AS test_assignment
+FROM dsv1069.events
+WHERE
+  event_name = 'test_assignment'
+GROUP BY 
+  event_id,
+  event_time,
+  user_id,
+  platform
+ORDER BY 
+  event_id
+) test_events
+GROUP BY 
+  test_id,
+  user_id
+ORDER BY
+  assignments DESC;
+--shows that for each test, each users has only 1 assignment
+
+--return a table of assignments and dates for each test (turning event stream into a table)
+SELECT  
+  event_id,
+  event_time,
+  user_id,
+  platform,
+  MAX(CASE WHEN parameter_name = 'test_id'
+    THEN CAST(parameter_value AS INT)
+    ELSE NULL
+  END) AS test_id,
+  MAX(CASE WHEN parameter_name = 'test_assignment'
+    THEN parameter_value
+    ELSE NULL
+  END) AS test_assignment
+FROM dsv1069.events
+WHERE 
+  event_name = 'test_assignment'
+GROUP BY 
+  event_id,
+  event_time,
+  user_id,
+  platform
+ORDER BY event_id;
+--returns table showing user assignments for tests, with test id and date of test
+
+
+/*(2) Create a new test metric to measure a change resulting from a change in the user experience*/
+--find whether a user created an order after their test assignment
+SELECT
+  test_events.test_id,
+  test_events.test_assignment,
+  test_events.user_id,
+  MAX(CASE WHEN orders.created_at > test_events.event_time 
+    THEN 1 ELSE 0 
+    END) AS orders_after_assignment_binary
+FROM
+    (
+    SELECT  
+      event_id,
+      event_time,
+      user_id,
+      MAX(CASE WHEN parameter_name = 'test_id'
+        THEN CAST(parameter_value AS INT)
+        ELSE NULL
+      END) AS test_id,
+      MAX(CASE WHEN parameter_name = 'test_assignment'
+        THEN CAST(parameter_value AS INT)
+        ELSE NULL
+      END) AS test_assignment
+    FROM dsv1069.events
+    WHERE
+      event_name = 'test_assignment'
+    GROUP BY 
+      event_id,
+      event_time,
+      user_id
+    ) test_events
+LEFT JOIN dsv1069.orders
+ON 
+  orders.user_id = test_events.user_id
+GROUP BY 
+  test_events.test_id,
+  test_events.test_assignment,
+  test_events.user_id;
+--returns column with binary value of 1 if did order after assignment, otherwise 0
+
+/*using above table, add following metrics:
+a) number of orders/invoices
+b) number of items/line-items ordered
+c) total revenue from orders after treatment*/
+
+SELECT
+  test_events.test_id,
+  test_events.test_assignment,
+  test_events.user_id,
+  COUNT(DISTINCT (CASE WHEN orders.created_at > test_events.event_time 
+    THEN invoice_id ELSE NULL
+    END)) AS orders_after_assignment,
+  COUNT(DISTINCT (CASE WHEN orders.created_at > test_events.event_time 
+    THEN line_item_id ELSE NULL
+    END)) AS items_after_assignment,
+  SUM(CASE WHEN orders.created_at > test_events.event_time 
+    THEN price ELSE 0 
+    END) AS total_revenue
+FROM
+    (
+    SELECT  
+      event_id,
+      event_time,
+      user_id,
+      MAX(CASE WHEN parameter_name = 'test_id'
+        THEN CAST(parameter_value AS INT)
+        ELSE NULL
+      END) AS test_id,
+      MAX(CASE WHEN parameter_name = 'test_assignment'
+        THEN CAST(parameter_value AS INT)
+        ELSE NULL
+      END) AS test_assignment
+    FROM dsv1069.events
+    WHERE
+      event_name = 'test_assignment'
+    GROUP BY 
+      event_id,
+      event_time,
+      user_id
+    ) test_events
+LEFT JOIN dsv1069.orders
+ON 
+  orders.user_id = test_events.user_id
+GROUP BY 
+  test_events.test_id,
+  test_events.test_assignment,
+  test_events.user_id;
+  
+/*(3) Analyse results
+Use order binary metric; for the proportion metric order binary compute the count of 
+users per treatment group for test_id 7, and the count of users with orders per treatment group*/
+SELECT 
+  test_assignment,
+  COUNT(user_id) AS users,
+  SUM(order_binary) AS users_with_orders
+FROM 
+  (
+  SELECT 
+    assignments.user_id,
+    assignments.test_id,
+    assignments.test_assignment,
+    MAX(CASE WHEN orders.created_at > assignments.event_time 
+      THEN 1 ELSE 0 
+      END) AS order_binary
+  FROM
+    (
+    SELECT  
+      event_id,
+      event_time,
+      user_id,
+      MAX(CASE WHEN parameter_name = 'test_id'
+        THEN CAST(parameter_value AS INT)
+        ELSE NULL
+      END) AS test_id,
+      MAX(CASE WHEN parameter_name = 'test_assignment'
+        THEN CAST(parameter_value AS INT)
+        ELSE NULL
+      END) AS test_assignment
+    FROM dsv1069.events
+    WHERE
+      event_name = 'test_assignment'
+    GROUP BY
+      event_id,
+      event_time,
+      user_id
+    ORDER BY event_id
+    ) assignments
+  LEFT OUTER JOIN 
+    dsv1069.orders
+  ON  
+    assignments.user_id = orders.user_id
+  GROUP BY 
+    assignments.user_id,
+    assignments.test_id,
+    assignments.test_assignment
+  ) user_level
+WHERE
+  test_id = 7
+GROUP BY 
+  test_assignment;
+/*returns table showing number of users in each assignment and number of users with order 
+per test assignment for test 7:
+test assignment 0: 19376 users, 2521 users with orders
+test assignment 1: 19271 users, 2633 users with orders
+These results taken to A/B testing calculator tool thumbstack, which generates p value*/
+
+--count number of users per treatment group in test 7 with views
+SELECT 
+  test_assignment,
+  COUNT(user_id) AS users,
+  SUM(views_binary) AS views_binary
+FROM 
+  (
+  SELECT 
+    assignments.user_id,
+    assignments.test_id,
+    assignments.test_assignment,
+    MAX(CASE WHEN views.event_time > assignments.event_time 
+      THEN 1 ELSE 0 
+      END) AS views_binary
+  FROM
+    (
+    SELECT  
+      event_id,
+      event_time,
+      user_id,
+      MAX(CASE WHEN parameter_name = 'test_id'
+        THEN CAST(parameter_value AS INT)
+        ELSE NULL
+      END) AS test_id,
+      MAX(CASE WHEN parameter_name = 'test_assignment'
+        THEN CAST(parameter_value AS INT)
+        ELSE NULL
+      END) AS test_assignment
+    FROM dsv1069.events
+    WHERE
+      event_name = 'test_assignment'
+    GROUP BY
+      event_id,
+      event_time,
+      user_id
+    ORDER BY event_id
+    ) assignments
+  LEFT OUTER JOIN 
+    (
+    SELECT *
+    FROM
+      dsv1069.events
+    WHERE
+      event_name = 'view_item'
+      ) views
+  ON  
+    assignments.user_id = views.user_id
+  GROUP BY 
+    assignments.user_id,
+    assignments.test_id,
+    assignments.test_assignment
+  ) user_level
+WHERE
+  test_id = 7
+GROUP BY 
+  test_assignment;
+/*result:
+test assignment 0: users 19376, views 10290
+test assignment 1: users 19271, views 10271*/
+
+--compute users who viewed an item within 30 days of their treatment event
+SELECT 
+  test_assignment,
+  COUNT(user_id) AS users,
+  SUM(views_binary) AS views_binary,
+  SUM(views_binary_30_days) AS views_binary_30_days
+FROM 
+  (
+  SELECT 
+    assignments.user_id,
+    assignments.test_id,
+    assignments.test_assignment,
+    MAX(CASE WHEN views.event_time > assignments.event_time 
+      THEN 1 ELSE 0 
+      END) AS views_binary,
+    MAX(CASE WHEN (views.event_time > assignments.event_time 
+      AND DATE_PART('day', views.event_time - assignments.event_time) <=30)
+      THEN 1 ELSE 0 
+      END) AS views_binary_30_days
+  FROM
+    (
+    SELECT  
+      event_id,
+      event_time,
+      user_id,
+      MAX(CASE WHEN parameter_name = 'test_id'
+        THEN CAST(parameter_value AS INT)
+        ELSE NULL
+      END) AS test_id,
+      MAX(CASE WHEN parameter_name = 'test_assignment'
+        THEN CAST(parameter_value AS INT)
+        ELSE NULL
+      END) AS test_assignment
+    FROM dsv1069.events
+    WHERE
+      event_name = 'test_assignment'
+    GROUP BY
+      event_id,
+      event_time,
+      user_id
+    ORDER BY event_id
+    ) assignments
+  LEFT OUTER JOIN 
+    (
+    SELECT *
+    FROM
+      dsv1069.events
+    WHERE
+      event_name = 'view_item'
+      ) views
+  ON  
+    assignments.user_id = views.user_id
+  GROUP BY 
+    assignments.user_id,
+    assignments.test_id,
+    assignments.test_assignment
+  ) user_level
+WHERE
+  test_id = 7
+GROUP BY 
+  test_assignment;
+/* results:
+assignment 0: users 19376; views 10290; views within 30 days 245
+assignment 1: users 19271; views 10271; views within 30 days 237*/
+
+/*Create metric invoices (a mean metric, not a binary metric) for test_id = 7:
+-count of users per treatment group
+-average value of the metric per treatment group
+-standard deviation of the metric per treatment group
+---could change parameter from invoices to any other variable*/
+SELECT
+  test_id,
+  test_assignment,
+  COUNT(user_id) AS users,
+  AVG(invoices) AS avg_invoices,
+  STDDEV(invoices) AS stddev_invoices
+FROM
+(
+SELECT
+  assignments.user_id,
+  assignments.test_id,
+  assignments.test_assignment,
+  COUNT(DISTINCT CASE WHEN orders.created_at > assignments.event_time THEN orders.invoice_id ELSE NULL END)
+    AS invoices,
+  COUNT(DISTINCT CASE WHEN orders.created_at > assignments.event_time THEN orders.line_item_id ELSE NULL END)
+    AS line_items,
+  COALESCE(SUM(CASE WHEN orders.created_at > assignments.event_time THEN orders.price ELSE 0 END), 0)
+    AS total_revenue
+FROM
+    (
+    SELECT
+      event_id,
+      event_time,
+      user_id,
+      MAX(CASE WHEN parameter_name = 'test_id'
+        THEN CAST(parameter_value AS INT)
+        ELSE NULL
+      END) AS test_id,
+      MAX(CASE WHEN parameter_name = 'test_assignment'
+        THEN CAST(parameter_value AS INT)
+        ELSE NULL
+      END) AS test_assignment
+      FROM
+        dsv1069.events
+      WHERE
+        event_name = 'test_assignment'
+      GROUP BY
+        event_id,
+        event_time,
+        user_id
+      ORDER BY event_id
+      ) assignments
+LEFT OUTER JOIN dsv1069.orders
+ON
+  assignments.user_id = orders.user_id
+GROUP BY 
+  assignments.user_id,
+  assignments.test_id,
+  assignments.test_assignment
+  ) mean_metrics
+GROUP BY
+  test_id,
+  test_assignment
+ORDER BY
+  test_id;
+/*  
+        test_id    test_assig    users    avg_invoices        stddev_invoices
+1	4	0	7210	0.16130374479889042	0.4068704838430513
+2	4	1	4680	0.1561965811965812	0.3984422271909843
+3	5	0	34420	0.15697269029633934	0.3981740389311411
+4	5	1	34143	0.16058928623729607	0.3997718047303091
+5	6	0	21687	0.15866648222437404	0.4009941437976927
+6	6	1	21703	0.1612219508823665	0.4066585004865856
+7	7	0	19376	0.14151527663088356	0.38177616218377725
+8	7	1	19271	0.14872087592755953	0.3900531525787444 */

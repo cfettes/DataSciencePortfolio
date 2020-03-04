@@ -1,0 +1,107 @@
+/*PROMO EMAIL
+Task: to find each user's most recently viewed product page for the marketing team to 
+send them a promo email on to encourage the user to revisit the site and place an order*/
+/*SQL queries completed as part of Learn SQL Basics for Data Science Specialisation on Coursera; Module 2: Data Wrangling, Analysis and AB Testing with SQL
+These queries use a synthetic e-commerce dataset, which can be accessed by signing up to Mode analytics through https://mode.com/, then following the link 
+https://modeanalytics.com/dsv1069/reports/0401f3197d05, and then clicking the 'clone' button to make a copy of the report. Once these steps have been completed, 
+queries can be made on the dataset*/
+
+
+--create subtable for recently viewed events using the view_item_events table
+SELECT *
+FROM  
+  (
+  SELECT
+      user_id,
+      item_id,
+      event_time,
+      ROW_NUMBER( ) OVER (PARTITION BY user_id ORDER BY event_time DESC)
+        AS view_number
+      /* could also use:
+      RANK( ) OVER (PARTITION BY user_id ORDER BY event_time DESC)
+        AS rank,
+      DENSE_RANK( ) OVER (PARTITION BY user_id ORDER BY event_time DESC)
+        AS dense_rank */
+  FROM 
+      dsv1069.view_item_events
+  ) recent_views
+JOIN  
+  dsv1069.users
+ON  
+  users.id = recent_views.user_id
+JOIN
+  dsv1069.items
+ON  
+  items.id = recent_views.item_id
+WHERE 
+    view_number = 1; --returns most recently viewed item
+  
+--clean up query and pull only columns needed
+SELECT 
+  users.id AS user_id,
+  users.email_address,
+  items.id AS item_id,
+  items.name AS item_name,
+  items.category AS item_category
+FROM  
+  (
+  SELECT
+      user_id,
+      item_id,
+      event_time,
+      ROW_NUMBER( ) OVER (PARTITION BY user_id ORDER BY event_time DESC)
+        AS view_number
+  FROM 
+      dsv1069.view_item_events
+  ) recent_views
+JOIN  
+  dsv1069.users
+ON  
+  users.id = recent_views.user_id
+JOIN
+  dsv1069.items
+ON  
+  items.id = recent_views.item_id
+WHERE
+    view_number = 1;
+  
+--add any extra filtering to make email better
+SELECT 
+  COALESCE(users.parent_user_id, users.id) AS user_id, --takes single id from user to avoid duplicating to merged users
+  users.email_address,
+  items.id AS item_id,
+  items.name AS item_name,
+  items.category AS item_category
+FROM  
+  (
+  SELECT
+      user_id,
+      item_id,
+      event_time,
+      ROW_NUMBER( ) OVER (PARTITION BY user_id ORDER BY event_time DESC)
+        AS view_number
+  FROM 
+      dsv1069.view_item_events
+  WHERE 
+    event_time >= '2017-01-01' --avoids sending emails to users who viewed items a long time ago
+  ) recent_views
+JOIN  
+  dsv1069.users
+ON  
+  users.id = recent_views.user_id
+JOIN
+  dsv1069.items
+ON  
+  items.id = recent_views.item_id
+LEFT OUTER JOIN --join with orders to avoid emailing users who already purchased the item, null value indicates not ordered
+  dsv1069.orders
+ON  
+  orders.item_id = recent_views.item_id
+AND
+  orders.user_id = recent_views.user_id
+WHERE
+  view_number = 1 --most recently viewed item from list of viewed items
+AND
+  users.deleted_at IS NULL --avoids emailing users who have been deleted
+AND
+  orders.item_id IS NULL; --avoids emailing users who viewed and already ordered item

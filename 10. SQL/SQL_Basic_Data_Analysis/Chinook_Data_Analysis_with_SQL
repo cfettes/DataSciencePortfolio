@@ -1,0 +1,226 @@
+/*These queries involve the use of the Chinook sample database
+Download database link here: https://www.sqlitetutorial.net/sqlite-sample-database/
+ER diagram here: https://ucde-rey.s3.amazonaws.com/DSV1015/ChinookDatabaseSchema.png
+*/
+
+--Find all the tracks that have a length of 5,000,000 milliseconds or more.
+SELECT *
+FROM Tracks
+WHERE Milliseconds >= 5000000;
+
+--Find all the invoices whose total is between $5 and $15 dollars.
+SELECT *
+FROM Invoices
+WHERE Total Between 5 AND 15;
+
+--Find all the customers from the following States: RJ, DF, AB, BC, CA, WA, NY.
+SELECT *
+FROM Customers
+WHERE State IN ('RJ','DF','AB','BC','CA','WA','NY');
+
+--Find all the invoices for customer 56 and 58 where the total was between $1.00 and $5.00.
+SELECT *
+FROM Invoices
+WHERE CustomerId IN ('56','58') 
+AND Total BETWEEN 1 AND 5;
+
+--Find all the tracks whose name starts with 'All'.
+SELECT *
+FROM Tracks
+WHERE Name LIKE 'All%';
+
+--Find all the customer emails that start with "J" and are from gmail.com.
+SELECT *
+FROM Customers
+WHERE Email LIKE 'j%@gmail.com';
+
+--Find all the invoices from the billing city Brasília, Edmonton, and Vancouver 
+--and sort in descending order by invoice ID.
+SELECT *
+FROM Invoices
+WHERE BillingCity IN ('Brasília', 'Edmonton', 'Vancouver')
+ORDER BY InvoiceId DESC;
+
+--Show the number of orders placed by each customer (hint: this is found in 
+--the invoices table) and sort the result by the number of orders in descending order.
+SELECT CustomerId, COUNT(*) AS num_orders
+FROM Invoices
+GROUP BY CustomerId
+ORDER BY num_orders DESC;
+
+--Find the albums with 12 or more tracks.
+SELECT AlbumId, COUNT(*) AS num_tracks
+FROM Tracks
+GROUP BY AlbumId
+HAVING num_tracks >= 12;
+
+--How many albums does the artist Led Zeppelin have? 
+SELECT ArtistId, AlbumId
+FROM albums
+WHERE ArtistId IN (SELECT ArtistId
+  FROM artists
+  WHERE Name = 'Led Zeppelin');
+--table returned has 14 albums
+
+--Create a list of album titles and the unit prices for the artist "Audioslave".
+SELECT a.Title, i.UnitPrice
+FROM albums a, invoice_items i
+WHERE ArtistId IN (SELECT ArtistId
+  FROM artists
+  WHERE Name = 'Audioslave');
+--10509 records returned
+
+--Find the first and last name of any customer who does not have an invoice
+SELECT FirstName, LastName
+FROM customers 
+LEFT JOIN invoices
+ON customers.CustomerId = invoices.CustomerId
+WHERE invoiceId IS NULL;
+--no records returned - all customers have an invoice
+
+--Find the total price for each album. What is total price for album 'Big Ones'?
+SELECT a.Title, SUM(UnitPrice) AS TotalPrice
+FROM albums a INNER JOIN tracks t
+ON a.AlbumId = t.AlbumId
+GROUP BY t.AlbumId;
+--total price 14.85
+
+--How many records are created when you apply a Cartesian join to the invoice 
+--and invoice items table?
+SELECT invoices.invoiceId, invoice_items.InvoiceId
+FROM invoices CROSS JOIN invoice_items;
+--922880
+
+--Using a subquery, find the names of all the tracks for the album "Californication"
+SELECT Name, AlbumId
+FROM tracks
+WHERE AlbumId IN (SELECT AlbumId
+  FROM albums
+  WHERE albums.Title = "Californication");
+
+--Find the total number of invoices for each customer along with the customer's 
+--full name, city and email.
+SELECT FirstName,
+       LastName,
+       City,
+       Email,
+       COUNT(i.CustomerId) AS Invoices
+FROM Customers c INNER JOIN Invoices i
+ON c.CustomerId = i.CustomerId
+GROUP BY c.CustomerId;
+
+--Retrieve the track name, album, artistID, and trackID for all the albums.
+SELECT t.Name, t.TrackId, a.Title, a.ArtistId
+FROM albums a INNER JOIN tracks t
+ON a.AlbumId = t.AlbumId;
+
+--Retrieve a list with the managers last name, and the last name of the employees 
+--who report to him or her.
+SELECT M.LastName AS Manager, 
+       E.LastName AS Employee
+FROM Employees E INNER JOIN Employees M 
+ON E.ReportsTo = M.EmployeeID;
+
+--Find the name and ID of the artists who do not have albums. 
+SELECT Name AS Artist,
+       artists.ArtistId,
+       albums.Title AS Album
+FROM artists LEFT JOIN albums
+ON artists.ArtistId = albums.ArtistId
+WHERE Album IS NULL;
+
+--Use a UNION to create a list of all the employee's and customer's first names 
+--and last names ordered by the last name in descending order.
+SELECT FirstName, LastName
+FROM employees
+UNION
+SELECT FirstName, LastName
+FROM customers
+ORDER BY LastName DESC;
+
+--See if there are any customers who have a different city listed in their billing 
+--city versus their customer city.
+SELECT c.CustomerId, c.City, i.BillingCity
+FROM customers c INNER JOIN invoices i
+ON c.CustomerId = i.CustomerId
+WHERE c.City <> i.BillingCity;
+--no customers returned, all have same residential and billing city
+
+--city and country together. Be sure to make a space in between these two and make it UPPER CASE.
+SELECT 
+CustomerId,
+FirstName,
+LastName,
+Address,
+UPPER(City || " " || Country) AS CityCountry
+FROM customers;
+
+--Create a new employee user id by combining the first 4 letters of the employee’s 
+--first name with the first 2 letters of the employee’s last name. 
+--Make the new field lower case and pull each individual step to show your work.
+SELECT FirstName,
+       LastName,
+       LOWER(SUBSTR(FirstName,1,4)) AS A,
+       LOWER(SUBSTR(LastName,1,2)) AS B,
+       LOWER(SUBSTR(FirstName,1,4)) || LOWER(SUBSTR(LastName,1,2)) AS UserId
+FROM employees;
+
+--Show a list of employees who have worked for the company for 15 or more years using
+--the current date function. Sort by lastname ascending.
+SELECT FirstName,
+       LastName,
+       HireDate,
+       (STRFTIME('%Y %m %d', 'now') - STRFTIME('%Y %m %d', HireDate))
+          AS YearsWorked
+FROM employees
+WHERE YearsWorked >= 15
+ORDER BY LastName ASC;
+
+--Profiling the Customers table: find cols with null values
+SELECT COUNT(*)
+FROM customers
+WHERE Fax IS NULL;
+--47 null vaues
+
+SELECT COUNT(*)
+FROM customers
+WHERE Address IS NULL;
+--0 null values
+
+SELECT COUNT(*)
+FROM customers
+WHERE Phone IS NULL;
+--1 null value
+
+SELECT COUNT(*)
+FROM customers
+WHERE FirstName IS NULL;
+--0 null values
+
+SELECT COUNT(*)
+FROM customers
+WHERE Company IS NULL;
+--49 null values
+
+SELECT COUNT(*)
+FROM customers
+WHERE PostalCode IS NULL;
+--4 null values
+
+--Find the cities with the most customers and rank in descending order.
+SELECT City,
+       COUNT(*)
+FROM customers
+GROUP BY City
+ORDER BY COUNT(*) DESC;
+
+--Create a new customer invoice id by combining a customer’s invoice id with their 
+--first and last name while ordering your query in the following order: firstname, 
+--lastname, and invoiceID.
+SELECT c.FirstName,
+       c.LastName,
+       i.InvoiceId,
+       c.FirstName || c.LastName || i.InvoiceId AS NewId
+FROM Customers c INNER JOIN Invoices i
+ON c.CustomerId = i.CustomerID
+ORDER BY c.FirstName, c.LastName, i.InvoiceId;

@@ -1,0 +1,150 @@
+/*SQL queries completed as part of Learn SQL Basics for Data Science Specialisation on Coursera; Module 2: Data Wrangling, Analysis and AB Testing with SQL
+These queries use a synthetic e-commerce dataset, which can be accessed by signing up to Mode analytics through https://mode.com/, then following the link 
+https://modeanalytics.com/dsv1069/reports/0401f3197d05, and then clicking the 'clone' button to make a copy of the report. Once these steps have been completed, 
+queries can be made on the dataset*/--Goal: Here we use users table to pull a list of user email addresses. */
+
+--Edit the query to pull email addresses, but only for non-deleted users
+SELECT id AS user_id, email_address
+FROM dsv1069.users
+WHERE deleted_at ISNULL;
+
+--Goal: Use the items table to count the number of items for sale in each category
+SELECT category, COUNT(id) AS item_count
+FROM dsv1069.items
+GROUP BY category
+ORDER BY item_count DESC;
+
+--Goal: Select all of the columns from the result when you JOIN the users table to the 
+--orders table
+SELECT *
+FROM dsv1069.users u JOIN dsv1069.orders o
+ON u.id = o.user_id;
+
+--count the number of viewed_item events
+SELECT COUNT(DISTINCT event_id) AS events
+FROM dsv1069.events
+GROUP BY event_name
+HAVING event_name = 'view_item';
+
+--Goal: Compute the number of items in the items table which have been ordered.
+SELECT COUNT(DISTINCT item_id) AS item_count
+FROM dsv1069.orders;
+
+--Goal: For each user figure out IF a user has ordered something, and when their first purchase was
+SELECT u.id AS user_id,
+  CASE 
+    WHEN o.invoice_id ISNULL THEN 'no orders'
+    ELSE 'ordered'
+  END AS any_orders,
+  MIN(o.paid_at) AS min_paid_at
+FROM dsv1069.users u
+LEFT JOIN dsv1069.orders o 
+ON o.user_id = u.id
+GROUP BY u.id, o.invoice_id;
+
+--Goal: Figure out what percent of users have ever viewed the user profile page
+SELECT 
+(CASE WHEN first_view IS NULL THEN false
+    ELSE true END) AS has_viewed_profile_page,
+COUNT(user_id) AS users
+FROM
+  (
+  SELECT 
+    users.id AS user_id,
+    MIN(event_time) AS first_view
+  FROM 
+    dsv1069.users
+  LEFT OUTER JOIN 
+    dsv1069.events
+  ON 
+    events.user_id = users.id
+  AND 
+    events.event_name = 'view_user_profile'
+  GROUP BY 
+    users.id
+  ) first_profile_views
+GROUP BY
+  (CASE WHEN first_view IS NULL THEN false
+    ELSE true END);
+
+
+--Goal: format the view_item event into a table with appropriate columns
+SELECT event_id,
+      event_time,
+      user_id,
+      platform,
+      MAX(CASE WHEN parameter_name = 'item_id'
+        THEN CAST(parameter_value AS INT)
+        ELSE NULL END) AS item_id,
+      MAX(CASE WHEN parameter_name = 'referrer'
+        THEN parameter_value
+        ELSE NULL END) AS referrer
+FROM dsv1069.events
+WHERE event_name = 'view_item'
+GROUP BY event_id,
+        event_time,
+        user_id,
+        platform
+ORDER BY event_id;
+
+
+--COUNTING USERS
+--understand data -  user table
+SELECT *
+FROM dsv1069.users;
+--created at - date user created
+--deleted at - date user deleted
+--merged_at - date information merged into the user account
+
+--look further at parent user id and merged at day where not null
+SELECT  
+  id,
+  parent_user_id,
+  merged_at
+FROM dsv1069.users
+ORDER BY parent_user_id ASC;
+--number of times where user information merged into earlier version of accou
+--happens in pairs - to count correctly, on day merged, subtract a user without deleting original
+
+--full query to count net users added/lost per day, accounting for merged and deleted users
+SELECT 
+  new.day,
+  new.new_users_added,
+  COALESCE(deleted.deleted_users,0) AS deleted_users, --if no value, put 0
+  COALESCE(merged.merged_users,0) AS merged_users,
+  --add in column for net users added/lost
+  (new.new_users_added - COALESCE(deleted.deleted_users,0) - COALESCE(merged.merged_users,0)) AS net_added_users
+  FROM
+      (SELECT 
+        date(created_at) AS day,
+        COUNT(*) AS new_users_added
+      FROM dsv1069.users
+      GROUP BY date(created_at)
+      ) new
+  LEFT JOIN
+  --join with deleted users
+      (SELECT 
+        date(deleted_at) AS day,
+        COUNT(*) AS deleted_users
+      FROM dsv1069.users
+      WHERE
+        deleted_at IS NOT NULL
+      GROUP BY 
+        date(deleted_at)
+      ) deleted
+  ON deleted.day = new.day --comparing new users added and old users deleted
+  --join with merged
+  LEFT JOIN
+      (SELECT 
+        date(merged_at) AS day,
+        COUNT(*) AS merged_users
+      FROM dsv1069.users
+      WHERE 
+        id <> parent_user_id --people merged in
+      AND
+        parent_user_id IS NOT NULL
+      GROUP BY
+        date(merged_at)
+      ) merged
+  ON merged.day = new.day
+  ORDER BY day DESC;

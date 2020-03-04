@@ -1,0 +1,105 @@
+/*TURN A CLEAN QUERY INTO A TABLE
+Tasks: (1) CREATE A VIEW_ITEM_EVENTS TABLE
+(2) CREATE A USER SNAPSHOT TABLE*/
+
+/*SQL queries completed as part of Learn SQL Basics for Data Science Specialisation on Coursera; Module 2: Data Wrangling, Analysis and AB Testing with SQL
+These queries use a synthetic e-commerce dataset, which can be accessed by signing up to Mode analytics through https://mode.com/, then following the link 
+https://modeanalytics.com/dsv1069/reports/0401f3197d05, and then clicking the 'clone' button to make a copy of the report. Once these steps have been completed, 
+queries can be made on the dataset*/
+
+--CREATE A VIEW_ITEM_EVENTS TABLE
+--create table [name]() to specify data types
+CREATE TABLE IF NOT EXISTS 'view_item_events' (
+event_id VARCHAR(32) NOT NULL PRIMARY KEY,
+event_time VARCHAR(26),
+user_id INT(10),
+platform VARCHAR(10),
+item_id INT(10),
+referrer VARCHAR(17)
+);
+
+--insert desired data into created table
+INSERT INTO
+'view_item_events'
+
+/*to remove all data from the table and replace with new data to avoid duplicating:
+REPLACE INTO
+'view_item_events
+*/
+
+SELECT
+    event_id,
+    TIMESTAMP(event_time) AS event_time, --datetime data type
+    user_id,
+    platform,
+    MAX(CASE WHEN parameter_name = 'item_id'
+        THEN parameter_value
+        ELSE NULL
+    END) AS item_id,
+    MAX(CASE WHEN parameter_name = 'referrer'
+        THEN parameter_value
+        ELSE NULL
+    END) AS referrer
+FROM
+    events
+WHERE
+    event_name = 'view_item'
+GROUP BY
+    event_id,
+    event_time,
+    user_id,
+    platform
+ORDER BY
+    event_id;
+    
+--check table 
+DESCRIBE view_item_events;
+
+--view first 10 entries
+SELECT * FROM view_item_events;
+
+--drop table
+DROP TABLE view_item_events;
+
+
+
+--CREATE A USER SNAPSHOT TABLE
+CREATE TABLE IF NOT EXISTS user_info
+(
+    user_id INT(10) NOT NULL,
+    created_today INT(1) NOT NULL,
+    is_deleted INT(1) NOT NULL,
+    is_deleted_today INT(1) NOT NULL,
+    has_ever_ordered INT(1) NOT NULL,
+    ordered_today INT(1) NOT NULL,
+    ds DATE NOT NULL
+);
+
+(% assign ds = '2019-01-01' %) --liquid tags, to insert a variable; change here for different date
+INSERT INTO
+    user_info
+SELECT 
+    users.id AS user_id,
+    IF(users.created_at = '{{ds}}', 1, 0) AS created_today,
+    IF(users.deleted_at <= '{{ds}}', 1, 0) AS is_deleted,
+    IF(users.deleted_at = '{{ds}}', 1, 0) AS is_deleted_today,
+    IF(users_with_orders.user_id IS NOT NULL, 1, 0) AS has_ever_ordered,
+    IF(users_with_orders_today.user_id IS NOT NULL, 1, 0) AS ordered_today,
+    '{{ds}}' AS ds
+FROM users
+LEFT OUTER JOIN
+    (
+    SELECT DISTINCT user_id
+    FROM orders
+    WHERE
+        created_at <= '{{ds}}'
+    ) users_with_orders
+ON users_with_orders.user_id = users.id
+LEFT OUTER JOIN
+    (
+    SELECT DISINCT user_id
+    FROM orders
+    WHERE created_at = '{{ds}}'
+    ) users_with_orders_today
+ON users_with_orders_today.user_id = users.id
+WHERE users.created_at <= '{{ds}}';

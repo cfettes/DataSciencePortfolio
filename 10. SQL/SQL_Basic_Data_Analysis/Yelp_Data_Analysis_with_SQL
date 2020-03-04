@@ -1,0 +1,611 @@
+/*Yelp Dataset SQL queries, completed as part of SQL for Data Science course on Coursera*/
+--schema is found here: https://github.com/2gotgrossman/yelp-dataset-challenge
+
+--Find the total number of records for each table in the schema
+SELECT COUNT(*)
+FROM user;
+
+SELECT COUNT(*)
+FROM business;
+
+SELECT COUNT(*)
+FROM friend;
+
+SELECT COUNT(*)
+FROM category;
+
+SELECT COUNT(*)
+FROM attribute;
+
+SELECT COUNT(*)
+FROM checkin;
+
+SELECT COUNT(*)
+FROM elite_years;
+
+SELECT COUNT(*)
+FROM hours;
+
+SELECT COUNT(*)
+FROM photo;
+
+SELECT COUNT(*)
+FROM review;
+
+SELECT COUNT(*)
+FROM tip;
+--all return 10,000
+
+--Find the total distinct records by either the foreign key or primary key for each table. 
+--If two foreign keys are listed in the table, please specify which foreign key.
+SELECT COUNT(DISTINCT(id))
+FROM business;
+--10000
+
+SELECT COUNT(DISTINCT(business_id))
+FROM hours;
+--1562
+
+SELECT COUNT(DISTINCT(business_id))
+FROM category;
+--2643
+
+SELECT COUNT(DISTINCT(business_id))
+FROM attribute;
+--1115
+
+SELECT COUNT(DISTINCT(id))
+FROM review;
+--10000
+
+SELECT COUNT(DISTINCT(business_id))
+FROM review;
+--8090
+
+SELECT COUNT(DISTINCT(user_id))
+FROM review;
+--9581
+
+SELECT COUNT(DISTINCT(business_id))
+FROM checkin;
+--493
+
+SELECT COUNT(DISTINCT(business_id))
+FROM photo;
+--6493
+
+SELECT COUNT(DISTINCT(id))
+FROM photo;
+--10000
+
+SELECT COUNT(DISTINCT(user_id))
+FROM tip;
+--537
+
+SELECT COUNT(DISTINCT(business_id))
+FROM tip;
+--3979
+
+SELECT COUNT(DISTINCT(id))
+FROM user;
+--10000
+
+SELECT COUNT(DISTINCT(user_id))
+FROM friend;
+--11
+
+SELECT COUNT(DISTINCT(user_id))
+FROM elite_years;
+--2780
+
+SELECT COUNT(*)
+FROM user
+WHERE id IS NULL OR 
+    name IS NULL OR 
+    review_count IS NULL OR 
+    yelping_since IS NULL OR
+    useful IS NULL OR 
+    funny IS NULL OR 
+    cool IS NULL OR 
+    fans IS NULL OR 
+    average_stars IS NULL OR 
+    compliment_hot IS NULL OR 
+    compliment_more IS NULL OR 
+    compliment_profile IS NULL OR 
+    compliment_cute IS NULL OR 
+    compliment_list IS NULL OR 
+    compliment_note IS NULL OR 
+    compliment_plain IS NULL OR 
+    compliment_cool IS NULL OR 
+    compliment_funny IS NULL OR 
+    compliment_writer IS NULL OR 
+    compliment_photos IS NULL;
+--no null values in user table
+
+--For selected tables and columns, find the smallest (minimum), largest (maximum), 
+--and average (mean) value
+--a. stars from review
+SELECT MIN(stars) AS min_stars,
+       MAX(stars) AS max_stars,
+       AVG(stars) AS avg_stars
+FROM review;
+--min:1; max:5; avg:3.7082
+
+--b. stars from business
+SELECT MIN(stars) AS min_stars,
+       MAX(stars) AS max_stars,
+       AVG(stars) AS avg_stars
+FROM business;
+--min:1.0; max:5.0; avg:3.6549
+
+--c. likes from tips
+SELECT MIN(likes) AS min_likes,
+       MAX(likes) AS max_likes,
+       AVG(likes) AS avg_likes
+FROM tip;
+--min:0; max:2; avg:0.0144
+
+--d. count from checkin
+SELECT MIN(count) AS min_count,
+       MAX(count) AS max_count,
+       AVG(count) AS avg_count
+FROM checkin;
+--min:1; max:53; avg:1.9414
+
+--e. review_count from user
+SELECT MIN(review_count) AS min_review_count,
+       MAX(review_count) AS max_review_count,
+       AVG(review_count) AS avg_review_count
+FROM user;
+--min:0; max:2000; avg: 24.2995
+
+--List the cities with the most reviews in descending order
+SELECT city,
+       SUM(review_count) AS num_reviews
+FROM business
+GROUP BY city
+ORDER BY num_reviews DESC;
+/*
++-----------------+-------------+
+| city            | num_reviews |
++-----------------+-------------+
+| Las Vegas       |       82854 |
+| Phoenix         |       34503 |
+| Toronto         |       24113 |
+| Scottsdale      |       20614 |
+| Charlotte       |       12523 |
+| Henderson       |       10871 |
+| Tempe           |       10504 |
+| Pittsburgh      |        9798 |
+| Montréal        |        9448 |
+| Chandler        |        8112 |
+| Mesa            |        6875 |
+| Gilbert         |        6380 |
+| Cleveland       |        5593 |
+| Madison         |        5265 |
+| Glendale        |        4406 |
+| Mississauga     |        3814 |
+| Edinburgh       |        2792 |
+| Peoria          |        2624 |
+| North Las Vegas |        2438 |
+| Markham         |        2352 |
+| Champaign       |        2029 |
+| Stuttgart       |        1849 |
+| Surprise        |        1520 |
+| Lakewood        |        1465 |
+| Goodyear        |        1155 |
++-----------------+-------------+
+(Output limit exceeded, 25 of 362 total rows shown)
+*/
+
+--Find the distribution of star ratings to the business in the following cities:
+--a. Avon
+SELECT stars as rating, COUNT(*) as count
+FROM business
+WHERE city = 'Avon'
+GROUP BY stars
+ORDER BY stars ASC;
+/*
++--------+-------+
+| rating | count |
++--------+-------+
+|    1.5 |     1 |
+|    2.5 |     2 |
+|    3.5 |     3 |
+|    4.0 |     2 |
+|    4.5 |     1 |
+|    5.0 |     1 |
++--------+-------+
+*/
+
+--b. Beachwood
+SELECT stars as rating, COUNT(*) as count
+FROM business
+WHERE city = 'Beachwood'
+GROUP BY stars
+ORDER BY stars ASC;
+/*
++--------+-------+
+| rating | count |
++--------+-------+
+|    2.0 |     1 |
+|    2.5 |     1 |
+|    3.0 |     2 |
+|    3.5 |     2 |
+|    4.0 |     1 |
+|    4.5 |     2 |
+|    5.0 |     5 |
++--------+-------+
+*/
+
+--Find the top 3 users based on their total number of reviews
+SELECT id, 
+       name,
+       review_count
+FROM user
+ORDER BY review_count DESC
+LIMIT 3;
+/*
++------------------------+--------+--------------+
+| id                     | name   | review_count |
++------------------------+--------+--------------+
+| -G7Zkl1wIWBBmD0KRy_sCw | Gerald |         2000 |
+| -3s52C4zL_DHRK0ULG6qtg | Sara   |         1629 |
+| -8lbUNlXVSoXqaRRiHiSNg | Yuri   |         1339 |
++------------------------+--------+--------------+
+*/
+
+--Does posing more reviews correlate with more fans?
+SELECT id,
+       name,
+       review_count,
+       fans,
+       yelping_since
+FROM user
+ORDER BY fans DESC;
+/*
++------------------------+-----------+--------------+------+---------------------+
+| id                     | name      | review_count | fans | yelping_since       |
++------------------------+-----------+--------------+------+---------------------+
+| -9I98YbNQnLdAmcYfb324Q | Amy       |          609 |  503 | 2007-07-19 00:00:00 |
+| -8EnCioUmDygAbsYZmTeRQ | Mimi      |          968 |  497 | 2011-03-30 00:00:00 |
+| --2vR0DIsmQ6WfcSzKWigw | Harald    |         1153 |  311 | 2012-11-27 00:00:00 |
+| -G7Zkl1wIWBBmD0KRy_sCw | Gerald    |         2000 |  253 | 2012-12-16 00:00:00 |
+| -0IiMAZI2SsQ7VmyzJjokQ | Christine |          930 |  173 | 2009-07-08 00:00:00 |
+| -g3XIcCb2b-BD0QBCcq2Sw | Lisa      |          813 |  159 | 2009-10-05 00:00:00 |
+| -9bbDysuiWeo2VShFJJtcw | Cat       |          377 |  133 | 2009-02-05 00:00:00 |
+| -FZBTkAZEXoP7CYvRV2ZwQ | William   |         1215 |  126 | 2015-02-19 00:00:00 |
+| -9da1xk7zgnnfO1uTVYGkA | Fran      |          862 |  124 | 2012-04-05 00:00:00 |
+| -lh59ko3dxChBSZ9U7LfUw | Lissa     |          834 |  120 | 2007-08-14 00:00:00 |
+| -B-QEUESGWHPE_889WJaeg | Mark      |          861 |  115 | 2009-05-31 00:00:00 |
+| -DmqnhW4Omr3YhmnigaqHg | Tiffany   |          408 |  111 | 2008-10-28 00:00:00 |
+| -cv9PPT7IHux7XUc9dOpkg | bernice   |          255 |  105 | 2007-08-29 00:00:00 |
+| -DFCC64NXgqrxlO8aLU5rg | Roanna    |         1039 |  104 | 2006-03-28 00:00:00 |
+| -IgKkE8JvYNWeGu8ze4P8Q | Angela    |          694 |  101 | 2010-10-01 00:00:00 |
+| -K2Tcgh2EKX6e6HqqIrBIQ | .Hon      |         1246 |  101 | 2006-07-19 00:00:00 |
+| -4viTt9UC44lWCFJwleMNQ | Ben       |          307 |   96 | 2007-03-10 00:00:00 |
+| -3i9bhfvrM3F1wsC9XIB8g | Linda     |          584 |   89 | 2005-08-07 00:00:00 |
+| -kLVfaJytOJY2-QdQoCcNQ | Christina |          842 |   85 | 2012-10-08 00:00:00 |
+| -ePh4Prox7ZXnEBNGKyUEA | Jessica   |          220 |   84 | 2009-01-12 00:00:00 |
+| -4BEUkLvHQntN6qPfKJP2w | Greg      |          408 |   81 | 2008-02-16 00:00:00 |
+| -C-l8EHSLXtZZVfUAUhsPA | Nieves    |          178 |   80 | 2013-07-08 00:00:00 |
+| -dw8f7FLaUmWR7bfJ_Yf0w | Sui       |          754 |   78 | 2009-09-07 00:00:00 |
+| -8lbUNlXVSoXqaRRiHiSNg | Yuri      |         1339 |   76 | 2008-01-03 00:00:00 |
+| -0zEEaDFIjABtPQni0XlHA | Nicole    |          161 |   73 | 2009-04-30 00:00:00 |
++------------------------+-----------+--------------+------+---------------------+
+(Output limit exceeded, 25 of 10000 total rows shown)
+*/
+
+SELECT id,
+       name,
+       review_count AS count,
+       fans,
+       (STRFTIME('%Y %m %d', 'now') - STRFTIME('%Y %m %d', yelping_since)) AS yelp_yrs
+FROM user
+ORDER BY count DESC;
+/*
++------------------------+-----------+-------+------+----------+
+| id                     | name      | count | fans | yelp_yrs |
++------------------------+-----------+-------+------+----------+
+| -G7Zkl1wIWBBmD0KRy_sCw | Gerald    |  2000 |  253 |        8 |
+| -3s52C4zL_DHRK0ULG6qtg | Sara      |  1629 |   50 |       10 |
+| -8lbUNlXVSoXqaRRiHiSNg | Yuri      |  1339 |   76 |       12 |
+| -K2Tcgh2EKX6e6HqqIrBIQ | .Hon      |  1246 |  101 |       14 |
+| -FZBTkAZEXoP7CYvRV2ZwQ | William   |  1215 |  126 |        5 |
+| --2vR0DIsmQ6WfcSzKWigw | Harald    |  1153 |  311 |        8 |
+| -gokwePdbXjfS0iF7NsUGA | eric      |  1116 |   16 |       13 |
+| -DFCC64NXgqrxlO8aLU5rg | Roanna    |  1039 |  104 |       14 |
+| -8EnCioUmDygAbsYZmTeRQ | Mimi      |   968 |  497 |        9 |
+| -0IiMAZI2SsQ7VmyzJjokQ | Christine |   930 |  173 |       11 |
+| -fUARDNuXAfrOn4WLSZLgA | Ed        |   904 |   38 |       11 |
+| -hKniZN2OdshWLHYuj21jQ | Nicole    |   864 |   43 |       14 |
+| -9da1xk7zgnnfO1uTVYGkA | Fran      |   862 |  124 |        8 |
+| -B-QEUESGWHPE_889WJaeg | Mark      |   861 |  115 |       11 |
+| -kLVfaJytOJY2-QdQoCcNQ | Christina |   842 |   85 |        8 |
+| -kO6984fXByyZm3_6z2JYg | Dominic   |   836 |   37 |        9 |
+| -lh59ko3dxChBSZ9U7LfUw | Lissa     |   834 |  120 |       13 |
+| -g3XIcCb2b-BD0QBCcq2Sw | Lisa      |   813 |  159 |       11 |
+| -l9giG8TSDBG1jnUBUXp5w | Alison    |   775 |   61 |       13 |
+| -dw8f7FLaUmWR7bfJ_Yf0w | Sui       |   754 |   78 |       11 |
+| -AaBjWJYiQxXkCMDlXfPGw | Tim       |   702 |   35 |       11 |
+| -jt1ACMiZljnBFvS6RRvnA | L         |   696 |   10 |       10 |
+| -IgKkE8JvYNWeGu8ze4P8Q | Angela    |   694 |  101 |       10 |
+| -hxUwfo3cMnLTv-CAaP69A | Crissy    |   676 |   25 |       12 |
+| -H6cTbVxeIRYR-atxdielQ | Lyn       |   675 |   45 |       11 |
++------------------------+-----------+-------+------+----------+
+(Output limit exceeded, 25 of 10000 total rows shown)
+*/
+--there does not appear to be a particularly string correlation between review count and fans
+
+--Are there more reviews with the word "love" or with the word "hate" in them?
+SELECT COUNT(*)									
+FROM review
+WHERE text LIKE "%love%";	
+/*
++----------+
+| COUNT(*) |
++----------+
+|     1780 |
++----------+
+*/
+
+SELECT COUNT(*)									
+FROM review
+WHERE text LIKE "%hate%";	
+/*
++----------+
+| COUNT(*) |
++----------+
+|      232 |
++----------+
+*/
+--more reviews with the word love
+
+--Find the top 10 users with the most fans
+SELECT id,
+       name,
+       fans
+FROM user
+ORDER BY fans DESC
+LIMIT 10;
+/*
++------------------------+-----------+------+
+| id                     | name      | fans |
++------------------------+-----------+------+
+| -9I98YbNQnLdAmcYfb324Q | Amy       |  503 |
+| -8EnCioUmDygAbsYZmTeRQ | Mimi      |  497 |
+| --2vR0DIsmQ6WfcSzKWigw | Harald    |  311 |
+| -G7Zkl1wIWBBmD0KRy_sCw | Gerald    |  253 |
+| -0IiMAZI2SsQ7VmyzJjokQ | Christine |  173 |
+| -g3XIcCb2b-BD0QBCcq2Sw | Lisa      |  159 |
+| -9bbDysuiWeo2VShFJJtcw | Cat       |  133 |
+| -FZBTkAZEXoP7CYvRV2ZwQ | William   |  126 |
+| -9da1xk7zgnnfO1uTVYGkA | Fran      |  124 |
+| -lh59ko3dxChBSZ9U7LfUw | Lissa     |  120 |
++------------------------+-----------+------+
+*/
+
+--Is there a strong relationship (or correlation) between having a high number 
+--of fans and being listed as "useful" or "funny?" Out of the top 10 users with 
+--the highest number of fans, what percent are also listed as “useful” or “funny”?
+SELECT name,
+       fans,
+       useful,
+       funny,
+       review_count,
+       yelping_since
+FROM user
+ORDER BY fans DESC
+LIMIT 10;
+/*
++-----------+------+--------+--------+--------------+---------------------+
+| name      | fans | useful |  funny | review_count | yelping_since       |
++-----------+------+--------+--------+--------------+---------------------+
+| Amy       |  503 |   3226 |   2554 |          609 | 2007-07-19 00:00:00 |
+| Mimi      |  497 |    257 |    138 |          968 | 2011-03-30 00:00:00 |
+| Harald    |  311 | 122921 | 122419 |         1153 | 2012-11-27 00:00:00 |
+| Gerald    |  253 |  17524 |   2324 |         2000 | 2012-12-16 00:00:00 |
+| Christine |  173 |   4834 |   6646 |          930 | 2009-07-08 00:00:00 |
+| Lisa      |  159 |     48 |     13 |          813 | 2009-10-05 00:00:00 |
+| Cat       |  133 |   1062 |    672 |          377 | 2009-02-05 00:00:00 |
+| William   |  126 |   9363 |   9361 |         1215 | 2015-02-19 00:00:00 |
+| Fran      |  124 |   9851 |   7606 |          862 | 2012-04-05 00:00:00 |
+| Lissa     |  120 |    455 |    150 |          834 | 2007-08-14 00:00:00 |
++-----------+------+--------+--------+--------------+---------------------+
+*/
+--strong correlation: 100% of users in the top 10 for fans are also listed as funny and useful
+
+/*Pick one city and category of your choice and group the businesses in that city or category by 
+their overall star rating. Compare the businesses with 2-3 stars to the businesses with 4-5 
+stars and answer the following questions.*/
+--Find unique categories:
+SELECT DISTINCT(category)
+FROM category;
+/*
++-----------------------+
+| category              |
++-----------------------+
+| Shopping              |
+| Shopping Centers      |
+| Food                  |
+| Soul Food             |
+| Convenience Stores    |
+| Restaurants           |
+| Coffee & Tea          |
+| Professional Services |
+| Matchmakers           |
+| Sandwiches            |
+| Tobacco Shops         |
+| Chiropractors         |
+| Health & Medical      |
+| Automotive            |
+| Oil Change Stations   |
+| Car Wash              |
+| Auto Detailing        |
+| Jewelry Repair        |
+| Gold Buyers           |
+| Local Services        |
+| Appraisal Services    |
+| Jewelry               |
+| Optometrists          |
+| Bowling               |
+| Active Life           |
++-----------------------+
+(Output limit exceeded, 25 of 712 total rows shown)
+*/
+
+--find unique cities:
+SELECT DISTINCT(city)
+FROM business;
+/*
++------------------+
+| city             |
++------------------+
+| Richmond Hill    |
+| Huntersville     |
+| Gilbert          |
+| Las Vegas        |
+| Tempe            |
+| Pittsburgh       |
+| Charlotte        |
+| Toronto          |
+| Henderson        |
+| Phoenix          |
+| Canonsburg       |
+| Bay Village      |
+| Streetsboro      |
+| Scottsdale       |
+| Edinburgh        |
+| Brunswick        |
+| North York       |
+| Stuttgart        |
+| Chandler         |
+| Markham          |
+| Highland Heights |
+| Indian Trail     |
+| Etobicoke        |
+| Rantoul          |
+| Peoria           |
++------------------+
+(Output limit exceeded, 25 of 362 total rows shown)
+*/
+
+--I will select Phoenix and Food as city and category respectively
+SELECT B.name,
+       B.review_count,
+       H.hours,
+       postal_code,
+       CASE
+           WHEN hours LIKE "%monday%" THEN 1
+           WHEN hours LIKE "%tuesday%" THEN 2
+           WHEN hours LIKE "%wednesday%" THEN 3
+           WHEN hours LIKE "%thursday%" THEN 4
+           WHEN hours LIKE "%friday%" THEN 5
+           WHEN hours LIKE "%saturday%" THEN 6
+           WHEN hours LIKE "%sunday%" THEN 7
+       END AS ord,
+       CASE
+           WHEN B.stars BETWEEN 2 AND 3 THEN '2-3 stars'
+           WHEN B.stars BETWEEN 4 AND 5 THEN '4-5 stars'
+       END AS star_rating
+FROM business B INNER JOIN hours H
+ON B.id = H.business_id
+INNER JOIN category C
+ON C.business_id = B.id
+WHERE (B.city == 'Phoenix'
+AND C.category LIKE 'Food')
+AND (B.stars BETWEEN 2 AND 3
+OR B.stars BETWEEN 4 AND 5)
+GROUP BY stars, ord
+ORDER BY ord, star_rating ASC;
+/*
++----------------------------------------+--------------+-----------------------+-------------+-----+-------------+
+| name                                   | review_count | hours                 | postal_code | ord | star_rating |
++----------------------------------------+--------------+-----------------------+-------------+-----+-------------+
+| Starbucks                              |           52 | Monday|5:00-20:00     | 85048       |   1 | 2-3 stars   |
+| Bootleggers Modern American Smokehouse |          431 | Monday|11:00-22:00    | 85028       |   1 | 4-5 stars   |
+| Starbucks                              |           52 | Tuesday|5:00-20:00    | 85048       |   2 | 2-3 stars   |
+| Bootleggers Modern American Smokehouse |          431 | Tuesday|11:00-22:00   | 85028       |   2 | 4-5 stars   |
+| Starbucks                              |           52 | Wednesday|5:00-20:00  | 85048       |   3 | 2-3 stars   |
+| Bootleggers Modern American Smokehouse |          431 | Wednesday|11:00-22:00 | 85028       |   3 | 4-5 stars   |
+| Starbucks                              |           52 | Thursday|5:00-20:30   | 85048       |   4 | 2-3 stars   |
+| Bootleggers Modern American Smokehouse |          431 | Thursday|11:00-22:00  | 85028       |   4 | 4-5 stars   |
+| Starbucks                              |           52 | Friday|5:00-20:00     | 85048       |   5 | 2-3 stars   |
+| Bootleggers Modern American Smokehouse |          431 | Friday|11:00-22:00    | 85028       |   5 | 4-5 stars   |
+| Starbucks                              |           52 | Saturday|5:00-20:00   | 85048       |   6 | 2-3 stars   |
+| Bootleggers Modern American Smokehouse |          431 | Saturday|11:00-22:00  | 85028       |   6 | 4-5 stars   |
+| Starbucks                              |           52 | Sunday|5:00-20:00     | 85048       |   7 | 2-3 stars   |
+| Bootleggers Modern American Smokehouse |          431 | Sunday|11:00-22:00    | 85028       |   7 | 4-5 stars   |
++----------------------------------------+--------------+-----------------------+-------------+--
+*/
+
+/*
+Those with 2-3 stars generally open early in the morning and close early evening (5:00-20:00), 
+and those with 4-5 stars open late morning and close late evening (11:00-22:00).
+The group with 2-3 stars has 52 reviews; the group with 4-5 stars has 431 reviews
+They differ marginally in location as indicated by postal code, but as there are only 2 
+establishments, further inference from location cannot be made (it cannot be determined 
+whether location is associated in anyway with star rating)
+*/
+
+/*From the Yelp data, group businesses based on the ones that are open and the ones that are closed. What
+differences can you find between the ones that are still open and the ones that are
+closed? */
+SELECT COUNT(DISTINCT(id)),
+       AVG(review_count),
+       SUM(review_count),
+       AVG(stars),
+       is_open
+FROM business
+GROUP BY is_open;
+/*
++---------------------+-------------------+-------------------+---------------+---------+
+| COUNT(DISTINCT(id)) | AVG(review_count) | SUM(review_count) |    AVG(stars) | is_open |
++---------------------+-------------------+-------------------+---------------+---------+
+|                1520 |     23.1980263158 |             35261 | 3.52039473684 |       0 |
+|                8480 |     31.7570754717 |            269300 | 3.67900943396 |       1 |
++---------------------+-------------------+-------------------+---------------+---------+
+*/
+
+
+/*Analysing the average star ratings and review counts for different food-type restaurants:
+Using the tables ‘category’ and ‘business’ restaurants are grouped together by their food category, 
+with average review count and average star rating for each food category generated.
+
+The food categories that will be analysed are: "Chinese", "Greek", "Mexican", "French", "Italian", 
+"Korean", "Japanese", "Latin American", "Mediterranean", "Indian", "Vietnamese", "Asian Fusion", 
+"German", "Halal", "Irish", "Malaysian", "Spanish”. Other categories were initially included, 
+but returned no results so entries for this category must not be present in this dataset.
+*/
+SELECT c.category, 
+       COUNT(b.name) AS num_restaurants,
+       AVG(b.stars) AS avg_stars,
+       AVG(b.review_count) AS avg_review_count
+FROM business b INNER JOIN category c ON c.business_id = b.id
+     WHERE c.category IN ("Chinese","Greek","Mexican","French","Italian","Korean","Japanese","Latin American","Mediterranean","Indian","Vietnamese","Asian Fusion","German","Halal","Irish","Malaysian","Spanish")
+GROUP BY c.category
+ORDER BY avg_stars DESC;
+
+/*
++----------------+-----------------+-----------+------------------+
+| category       | num_restaurants | avg_stars | avg_review_count |
++----------------+-----------------+-----------+------------------+
+| Halal          |               1 |       5.0 |            267.0 |
+| Greek          |               2 |       4.5 |             29.5 |
+| Mediterranean  |               2 |       4.5 |            161.0 |
+| Korean         |               2 |      4.25 |             31.5 |
+| French         |               2 |       4.0 |            128.5 |
+| Latin American |               2 |       4.0 |             38.5 |
+| Malaysian      |               1 |       4.0 |            768.0 |
+| Spanish        |               2 |       4.0 |             48.5 |
+| Japanese       |               5 |       3.8 |             30.4 |
+| Indian         |               5 |       3.6 |             12.6 |
+| Asian Fusion   |               2 |       3.5 |            396.5 |
+| Italian        |               2 |       3.5 |             74.0 |
+| Mexican        |               7 |       3.5 |    46.7142857143 |
+| Vietnamese     |               1 |       3.5 |             62.0 |
+| Chinese        |               4 |     3.125 |            199.0 |
+| German         |               2 |       3.0 |             26.5 |
+| Irish          |               1 |       3.0 |            141.0 |
++----------------+-----------------+-----------+------------------+
+*/

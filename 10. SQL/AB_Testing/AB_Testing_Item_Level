@@ -1,0 +1,171 @@
+--Reformat the final_assignments_qa to look like the final_assignments table, filling in any missing values with a placeholder of the appropriate data type.
+
+SELECT 
+  item_id,
+  test_a AS test_assignment,
+  (CASE WHEN test_a is NOT NULL then 'item_test_a' ELSE NULL END) AS test_number,
+  (CASE WHEN test_a is NOT NULL then '2013-01-05 00:00:00' ELSE NULL END) AS test_start_date
+FROM 
+  dsv1069.final_assignments_qa
+UNION
+SELECT 
+  item_id,
+  test_b AS test_assignment,
+  (CASE WHEN test_b is NOT NULL then 'item_test_b' ELSE NULL END) AS test_number,
+  (CASE WHEN test_b is NOT NULL then '2013-01-05 00:00:00' ELSE NULL END) AS test_start_date
+FROM 
+  dsv1069.final_assignments_qa
+UNION
+SELECT 
+  item_id,
+  test_c AS test_assignment,
+  (CASE WHEN test_c is NOT NULL then 'item_test_c' ELSE NULL END) AS test_number,
+  (CASE WHEN test_c is NOT NULL then '2013-01-05 00:00:00' ELSE NULL END) AS test_start_date
+FROM 
+  dsv1069.final_assignments_qa
+UNION
+SELECT 
+  item_id,
+  test_d AS test_assignment,
+  (CASE WHEN test_d is NOT NULL then 'item_test_d' ELSE NULL END) AS test_number,
+  (CASE WHEN test_d is NOT NULL then '2013-01-05 00:00:00' ELSE NULL END) AS test_start_date
+FROM 
+  dsv1069.final_assignments_qa
+UNION
+SELECT 
+  item_id,
+  test_e AS test_assignment,
+  (CASE WHEN test_e is NOT NULL then 'item_test_e' ELSE NULL END) AS test_number,
+  (CASE WHEN test_e is NOT NULL then '2013-01-05 00:00:00' ELSE NULL END) AS test_start_date
+FROM 
+  dsv1069.final_assignments_qa
+UNION
+SELECT 
+  item_id,
+  test_f AS test_assignment,
+  (CASE WHEN test_f is NOT NULL then 'item_test_f' ELSE NULL END) AS test_number,
+  (CASE WHEN test_f is NOT NULL then '2013-01-05 00:00:00' ELSE NULL END) AS test_start_date
+FROM 
+  dsv1069.final_assignments_qa
+ORDER BY test_number;
+
+
+-- compute order_binary for the 30 day window after the test_start_date
+-- for the test named item_test_2
+SELECT
+  test_assignment,
+  COUNT(DISTINCT item_id) AS number_of_items,
+  SUM(order_binary) AS items_ordered_30d
+FROM
+  (
+  SELECT
+  item_test_2_order.item_id,
+  item_test_2_order.test_assignment,
+  item_test_2_order.test_number,
+  item_test_2_order.test_start_date,
+  item_test_2_order.created_at,
+  MAX(CASE WHEN (created_at > test_start_date AND
+            DATE_PART('day', created_at-test_start_date) <= 30)
+      THEN 1 ELSE 0 END) AS order_binary
+FROM
+  (
+  SELECT
+    final_assignments.*,
+    DATE(orders.created_at) AS created_at
+  FROM 
+    dsv1069.final_assignments AS final_assignments
+  LEFT JOIN
+    dsv1069.orders AS orders
+  ON
+    final_assignments.item_id = orders.item_id
+  WHERE
+    test_number = 'item_test_2'
+  ) AS item_test_2_order
+GROUP BY
+  item_test_2_order.item_id,
+  item_test_2_order.test_assignment,
+  item_test_2_order.test_number,
+  item_test_2_order.test_start_date,
+  item_test_2_order.created_at
+  ) AS order_binary
+GROUP BY
+  test_assignment;
+  
+-- compute view_binary for the 30 day window after the test_start_date
+-- for the test named item_test_2
+SELECT 
+  test_assignment,
+  test_number,
+  count(item) AS item,
+  SUM(view_binary_30d) AS view_binary_30d
+FROM 
+  (SELECT 
+    final_assignments.item_id AS item,
+    test_assignment,
+    test_number,
+    test_start_date,
+    MAX((CASE WHEN date(event_time) - date(test_start_date) BETWEEN 0 AND 30 THEN 1 ELSE 0 END)) AS view_binary_30d
+  FROM 
+    dsv1069.final_assignments
+  LEFT JOIN dsv1069.view_item_events
+  ON final_assignments.item_id = view_item_events.item_id
+  WHERE test_number = 'item_test_2'
+  GROUP BY
+    final_assignments.item_id,
+    test_assignment,
+    test_number,
+    test_start_date
+  ) AS view_binary
+GROUP BY
+  test_assignment,
+  test_number,
+  test_start_date;
+  
+/*
+For order binary, the null hypothesis is that there is no difference in number of items 
+ordered within 30 days between assignment group 0 and assignment group 1.
+The alternative hypothesis is that items ordered within 30 days is greater for the 
+treatment group (assignment group 1) compared to the control group (assignment group 0).
+Using the https://thumbtack.github.io/abba/demo/abba.html, the lifts in metric and the 
+p-value for the 30 day order binary metric using a interval 95% confidence was computed. 
+Results are as follows:
+Control:
+Success 34%
+Treatment:
+Success 34%
+Lift -0.5%
+p-value 0.93
+95% confidence interval -12 - 11%
+This p-value of 0.93 is very high, therefore, even at a high significance level (5%), 
+the p-value is much higher. Therefore, the null hypothesis is accepted; there is no 
+difference in the number of items ordered within 30 days between the treatment and control 
+groups. This conclusion is further supported by the 95% confidence interval; we can be 95% 
+confident that the true difference between treatment and control groups in number of items 
+ordered within 30 days is between -12% and 11%. As this interval crosses 0, no difference 
+between groups is a reasonable possibility, therefore we can not be certain that treatment 
+has any effect or if it does, the direction of the effect.*/
+
+/*
+For view binary, the null hypothesis is that there is no difference in number of items 
+viewed within 30 days between assignment group 0 and assignment group 1.
+The alternative hypothesis is that items viewed within 30 days is greater for the treatment 
+group (assignment group 1) compared to the control group (assignment group 0).
+Using the https://thumbtack.github.io/abba/demo/abba.html, the lifts in metric and the 
+p-value for the 30 day view binary metric using a interval 95% confidence was computed. 
+Results are as follows:
+Control:
+Success 82%
+Treatment:
+Success 84%
+Lift 2.3%
+p-value 0.25
+95% confidence interval -1.6 - 6.1%
+This p-value of 0.25 is still quite high, therefore, even at a high significance level 
+(5% or 0.05), the p-value is much higher. Therefore, the null hypothesis is accepted; 
+there is no difference in the number of items viewed within 30 days between the treatment 
+and control groups. This conclusion is again further supported by the 95% confidence 
+interval; we can be 95% confident that the true difference between treatment and control 
+groups in number of items ordered within 30 days is between -1.6% and 6.1%. As this 
+interval crosses 0, no difference between groups is a reasonable possibility, therefore 
+we can not be certain that treatment has any effect or if it does, the direction of the 
+effect.*/

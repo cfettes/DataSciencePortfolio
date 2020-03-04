@@ -1,0 +1,86 @@
+/*CREATE A ROLLUP TABLE
+Task: create an aggregation table with a rolling date periof
+to report on how many orders are placed each day*/
+
+/*SQL queries completed as part of Learn SQL Basics for Data Science Specialisation on Coursera; Module 2: Data Wrangling, Analysis and AB Testing with SQL
+These queries use a synthetic e-commerce dataset, which can be accessed by signing up to Mode analytics through https://mode.com/, then following the link 
+https://modeanalytics.com/dsv1069/reports/0401f3197d05, and then clicking the 'clone' button to make a copy of the report. Once these steps have been completed, 
+queries can be made on the dataset*/
+
+--create subtable of orders per day
+SELECT 
+  date(paid_at) AS day,
+  COUNT(DISTINCT invoice_id) AS orders,
+  COUNT(DISTINCT line_item_id) AS line_items
+FROM  
+  dsv1069.orders
+GROUP BY
+  date(paid_at);
+--from this can see some dates missing, so need to join this into the date roll-up table
+
+--join subtable to dates rollup table so get a row for every date 
+SELECT *
+FROM  
+  dsv1069.dates_rollup
+LEFT OUTER JOIN
+(
+    SELECT 
+      date(paid_at) AS day,
+      COUNT(DISTINCT invoice_id) AS orders,
+      COUNT(DISTINCT line_item_id) AS line_items
+    FROM  
+      dsv1069.orders
+    GROUP BY
+      date(paid_at)
+    ) daily_orders
+ON  
+  daily_orders.day = dates_rollup.date;
+  
+--clean up columns of the above table to include information want to return
+--plus aggregations needed to get a count of the orders made per day
+SELECT 
+  dates_rollup.date,
+  COALESCE(SUM(orders),0) AS orders,
+  COALESCE(SUM(items_ordered),0) AS items_ordered
+FROM  
+  dsv1069.dates_rollup
+LEFT OUTER JOIN
+(
+    SELECT 
+      date(paid_at) AS day,
+      COUNT(DISTINCT invoice_id) AS orders,
+      COUNT(DISTINCT line_item_id) AS items_ordered
+    FROM  
+      dsv1069.orders
+    GROUP BY
+      date(paid_at)
+    ) daily_orders
+ON  
+  daily_orders.day = dates_rollup.date
+GROUP BY 
+  dates_rollup.date;
+  
+--Weekly Rollup: edit join condition to create 7 day rolling orders table
+SELECT 
+  dates_rollup.date,
+  COALESCE(SUM(orders),0) AS orders,
+  COALESCE(SUM(items_ordered),0) AS items_ordered
+FROM  
+  dsv1069.dates_rollup
+LEFT OUTER JOIN
+(
+    SELECT 
+      date(paid_at) AS day,
+      COUNT(DISTINCT invoice_id) AS orders,
+      COUNT(DISTINCT line_item_id) AS items_ordered
+    FROM  
+      dsv1069.orders
+    GROUP BY
+      date(orders.paid_at)
+    ) daily_orders
+ON  
+  dates_rollup.date >= daily_orders.day
+AND
+  dates_rollup.d7_ago < daily_orders.day
+GROUP BY 
+  dates_rollup.date;
