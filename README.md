@@ -4,20 +4,20 @@ This repository contains a number of data science projects that I have completed
 
 Projects included:   
 **A. Classification**     
-..a. Bank Marketing Analysis      
-  b. Breast Cancer Diagnosis Prediction       
-  c. MNIST Classification     
-  d. Gaussian Generative Wine Classification  
-  e. Logistic Regression from Scratch to Predict Cervical Cancer    
+    a. Bank Marketing Analysis      
+    b. Breast Cancer Diagnosis Prediction       
+    c. MNIST Classification     
+    d. Gaussian Generative Wine Classification  
+    e. Logistic Regression from Scratch to Predict Cervical Cancer    
 
 **B. Clustering**      
-  a. Banknotes Authentication    
-  b. E-Commerce Customer Segmentation     
+    a. Banknotes Authentication    
+    b. E-Commerce Customer Segmentation     
   
 **C. Regression**   
-  a. Linear Regression from Scratch to Predict Walmart Sales    
-  b. Predicting Future Sales       
-  c. Predicting PM2.5 Concentration in China    
+    a. Linear Regression from Scratch to Predict Walmart Sales    
+    b. Predicting Future Sales       
+    c. Predicting PM2.5 Concentration in China    
   
 **D. Deep Learning and Neural Networks**  
   a. Autoencoders     
