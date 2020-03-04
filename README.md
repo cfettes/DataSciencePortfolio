@@ -4,7 +4,7 @@ This repository contains a number of data science projects that I have completed
 
 Projects included:   
 **A. Classification**     
-  a. Bank Marketing Analysis      
+..a. Bank Marketing Analysis      
   b. Breast Cancer Diagnosis Prediction       
   c. MNIST Classification     
   d. Gaussian Generative Wine Classification  
