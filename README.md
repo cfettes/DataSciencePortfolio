@@ -10,16 +10,13 @@ Projects included:
     c. MNIST Classification     
     d. Gaussian Generative Wine Classification  
     e. Logistic Regression from Scratch to Predict Cervical Cancer    
-
 **B. Clustering**      
     a. Banknotes Authentication    
-    b. E-Commerce Customer Segmentation     
-  
+    b. E-Commerce Customer Segmentation       
 **C. Regression**   
     a. Linear Regression from Scratch to Predict Walmart Sales    
     b. Predicting Future Sales       
     c. Predicting PM2.5 Concentration in China    
-  
 **D. Deep Learning and Neural Networks**  
   a. Autoencoders     
   b. CNN for Predicting Picture Labels    
@@ -27,8 +24,7 @@ Projects included:
   d. Building RNN from scratch to generate names of dinosaurs, people and Pokemon      
   e. Review Summarisation   
   f. Sentiment Analysis using Deep Learning       
-  g. Stock Price Timeseries Predictions with RNN and LSTM      
-  
+  g. Stock Price Timeseries Predictions with RNN and LSTM       
 **E. NLP**   
   a. Chatbots:         
           (i) Retrieval Chatbot with PyTorch;       
@@ -40,19 +36,15 @@ Projects included:
   d. Sentiment Analysis with Linear Classifiers    
   e. Multilabel Classification - Predicting StackOverflow Tags    
   f. Named Entity Recognition    
-  g. Topic Modelling Amazon Reviews    
-  
+  g. Topic Modelling Amazon Reviews     
 **F. Recommenders**    
-  a. Collaborative Filtering Movie Recommendations     
-  
+  a. Collaborative Filtering Movie Recommendations      
 **G. Statistical Analysis**    
-  a. NHANES - Analysis of BP    
-  
+  a. NHANES - Analysis of BP     
 **H. Other**    
   a. Association Rule Learning - Basket Analysis with Apriori  
   b. CLV and Churn with Lifetimes     
   c. Experiments with PCA on different datasets    
-  
 **I. Bayesian**     
   a. Bayesian Linear Regression for House Sale Price Prediction    
   b. Bayesian Optimisation    
@@ -60,6 +52,5 @@ Projects included:
   d. Expectation Maximisation    
   e. Logistic Regression with PyMC3    
   f. VAE on MNIST and CIFAR   
-  
 **J. SQL**   
   
