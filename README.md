@@ -71,4 +71,11 @@ Projects included:
 	
 	
 **J. SQL**   
+
+**K. Computer Vision**   
+		a. Face Detection     
+		b. Face Recognition    
+		c. Facial Keypoints    
+		d. GAN for Face Generation   
+		e. Image Alignment    
   
