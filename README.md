@@ -70,7 +70,8 @@ Projects included:
 		c. Deep Generative Models on CelebA dataset - includes VAE, GAN and VAEGAN      
 		d. Expectation Maximisation    
 		e. Logistic Regression with PyMC3    
-		f. VAE on MNIST and CIFAR   
+		f. Measuring Z Boson Mass    
+		g. VAE on MNIST and CIFAR   
 	
 	
 **J. SQL**   
