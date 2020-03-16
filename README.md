@@ -1,15 +1,18 @@
 # DataSciencePortfolio
 
-This repository contains a number of data science projects that I have completed on my quest to learn more about data science and machine learning
+This repository contains a number of data science projects that I have completed on my quest to learn more about data science and machine learning. There are more detailed descriptions of each project within the subfolders' README
 
 Projects included:   
 
 **A. Classification:**            
 		a. Bank Marketing Analysis     
-		b. Breast Cancer Diagnosis Prediction    
-		c. MNIST Classification    
-		d. Gaussian Generative Wine Classification   
-		e. Logistic Regression from Scratch to Predict Cervical Cancer     
+		b. Basetrack Source Discrimination      
+		c. Breast Cancer Diagnosis Prediction    
+		d. MNIST Classification    
+		e. Gaussian Generative Wine Classification   
+		f. Logistic Regression from Scratch to Predict Cervical Cancer     
+		g. Particle Identification     
+		h. Predict Signal Events     
 	
 	
 **B. Clustering:**          
@@ -67,7 +70,8 @@ Projects included:
 		c. Deep Generative Models on CelebA dataset - includes VAE, GAN and VAEGAN      
 		d. Expectation Maximisation    
 		e. Logistic Regression with PyMC3    
-		f. VAE on MNIST and CIFAR   
+		f. Measuring Z Boson Mass    
+		g. VAE on MNIST and CIFAR   
 	
 	
 **J. SQL**   
