@@ -83,3 +83,7 @@ Projects included:
 		d. GAN for Face Generation   
 		e. Image Alignment    
   
+**L. PySpark**
+		a. Classification with Pyspark - Mulitclass Classification of Cover Type, Predicting Credit Risk
+		b. Clustering with PySpark - Credit Card Dataset Clustering
+		c. Regression with PySpark - Predicting Insurance Charges
