@@ -1,0 +1,24 @@
+# Requirements
+include requirements*.txt
+
+# Include license, Readme, etc.
+include LICENSE
+include *.md
+
+# Styles
+include subpackages/instant_eda/visualisation/*.mplstyle
+
+# Templates and static resources
+recursive-include subpackages/instant_eda/report/presentation/flavours/html/templates *.html *.js *.css
+
+# Configuration
+include subpackages/instant_eda/*.yaml
+
+# Exclude development, docs, testing and example code
+#exclude .pre-commit-config.yaml
+include Makefile make.bat
+#exclude docs examples tests docsrc
+#recursive-exclude docs *
+#recursive-exclude docsrc *
+#recursive-exclude examples *
+#recursive-exclude tests *
